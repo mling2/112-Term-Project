@@ -1,6 +1,5 @@
-import pygame, random
-import mapGenerator
-from cmu_112_graphics import *
+import pygame, random, math
+from bloons import * 
 
 class Tower(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -8,6 +7,12 @@ class Tower(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.drag = False
+        self.initPos = (x,y)
+        self.inMap = False
+        self.showRange = False
+        self.tick = 0
+        self.angle = 0
+        self.weapons = pygame.sprite.Group()
 
     def getRect(self): 
         self.rect = pygame.Rect(self.x - self.radiusX, self.y - self.radiusY,
@@ -22,6 +27,12 @@ class Tower(pygame.sprite.Sprite):
             return True
         return False
 
+    def checkRange(self, position):
+        if ((position[0] < self.rect.right+self.firingRange) and (position[0] > self.rect.left-self.firingRange) and 
+            (position[1] < self.rect.bottom+self.firingRange) and (position[1] > self.rect.top-self.firingRange)):
+            return True
+        return False
+
     def getDims(self, scale):
         self.width = self.image.get_width()//scale
         self.height = self.image.get_height()//scale
@@ -30,163 +41,190 @@ class Tower(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x - self.radiusX, self.y - self.radiusY,
                                 self.width, self.height)
 
+    def fireWeapons(self, bloons):
+        shortest = None
+        shortestBloon = None
+        for bloon in bloons:
+            if type(bloon) != Camo:
+                current = len(bloon.tiles)
+                if ((shortest == None) or (current <= shortest)):
+                    shortest = current
+                    shortestBloon = bloon
+        if shortest == None: self.angle = 0
+        else:
+            vecX = shortestBloon.x - self.x
+            vecY = shortestBloon.y - self.y 
+            if vecX == 0:
+                vecX = 0.01
+            self.angle = math.atan2(vecY, vecX)
+        self.rotate()
+        return self.angle
+
+    def rotate(self):
+        self.getRect()
+        angle = math.degrees(self.angle)
+        self.image = pygame.transform.rotate(self.originalImage, -angle).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x, self.y
+        pygame.display.update()
+
 class Dart(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("dartMonkey.png")
-        self.getDims(6)
+        self.originalImage = pygame.image.load('gameDart.png').convert_alpha()
+        self.image = pygame.image.load("dartMonkey.png").convert_alpha()
+        self.getDims(8)
         self.name = "DART MONKEY"
+        self.originalImage = pygame.transform.scale(self.originalImage, (self.width-20,self.height-20))
+        self.originalImage = pygame.transform.rotate(self.originalImage, -90)
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
-
+        self.cost = 100
+        self.firingRange = 100
+        self.timerDelay = 2000
+        self.tickLevel = 100
+    
 class Boom(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("boomerangMonkey.png")
-        self.getDims(5)
+        self.image = pygame.image.load("boomerangMonkey.png").convert_alpha()
+        self.getDims(6)
         self.name = "BOOMERANG MONKEY"
+        self.originalImage = pygame.image.load('gameBoomer.png').convert_alpha()
+        self.originalImage = pygame.transform.rotate(self.originalImage, -90)
+        self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
+        self.cost = 300
+        self.firingRange = 150
+        self.timerDelay = 1000
+        self.tickLevel = 50
 
 class Bomb(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("bombShooter.png")
-        self.getDims(6)
+        self.image = pygame.image.load("bombShooter.png").convert_alpha()
+        self.getDims(8)
         self.name = "BOMB SHOOTER"
+        self.originalImage = pygame.image.load('gameBomb.png').convert_alpha()
+        self.originalImage = pygame.transform.rotate(self.originalImage, -90)
+        self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
+        self.cost = 500
+        self.firingRange = 200
+        self.timerDelay = 1000
+        self.tickLevel = 100
+
+    def fireWeapons(self, bloons):
+        strongest = 0
+        strongestBloon = None
+        for bloon in bloons:
+            current = bloon.health
+            if (strongestBloon == None) or (current > strongest):
+                strongest = current
+                strongestBloon = bloon
+        if strongestBloon == None:
+            self.angle = 0
+        else:
+            vecX = strongestBloon.x - self.x
+            vecY = strongestBloon.y - self.y
+            if vecX == 0:
+                vecX = 0.01
+            self.angle = math.atan2(vecY,vecX)
+        self.rotate()
+        return self.angle
+
 
 class SuperM(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("superMonkey.png")
-        self.getDims(5)
+        self.image = pygame.image.load("superMonkey.png").convert_alpha()
+        self.getDims(6)
         self.name = "SUPER MONKEY"
+        self.originalImage = pygame.image.load('gameSuper.png').convert_alpha()
+        self.originalImage = pygame.transform.rotate(self.originalImage, -90)
+        self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
+        self.cost = 1000
+        self.firingRange = 300
+        self.timerDelay = 1000
+        self.tickLevel = 25
+
+    def fireWeapons(self, bloons):
+        strongest = 0
+        strongestBloon = None
+        for bloon in bloons:
+            current = bloon.health
+            if (strongestBloon == None) or (current > strongest):
+                strongest = current
+                strongestBloon = bloon
+        if strongestBloon == None:
+            self.angle = 0
+        else:
+            vecX = strongestBloon.x - self.x
+            vecY = strongestBloon.y - self.y
+            if vecX == 0:
+                vecX = 0.01
+            self.angle = math.atan2(vecY,vecX)
+        self.rotate()
+        return self.angle
 
 class Wizard(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("wizardMonkey.png")
-        self.getDims(6)
+        self.image = pygame.image.load("wizardMonkey.png").convert_alpha()
+        self.getDims(8)
         self.name = "WIZARD MONKEY"
+        self.originalImage = pygame.image.load('gameWizard.png').convert_alpha()
+        self.originalImage = pygame.transform.rotate(self.originalImage, -90)
+        self.originalImage = pygame.transform.scale(self.originalImage, (self.originalImage.get_width()-20, self.originalImage.get_height()-20))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
+        self.cost = 200
+        self.firingRange = 100
+        self.timerDelay = 1000
+        self.tickLevel = 100
+
+    def findClosestTile(self, tiles):
+        min = None
+        minTile = None
+        for tile in tiles:
+            dist = math.sqrt((tile.x-self.x)**2 + (tile.y-self.y)**2)
+            if ((minTile == None) or (dist <= min)):
+                min = dist
+                minTile = tile
+        vecX = tile.x - self.x
+        vecY = tile.y - self.y 
+        if vecX == 0:
+            vecX = 0.01
+        self.angle = math.atan2(vecY, vecX)+180
+        self.rotate()
+        return minTile
 
 class Ninja(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("ninjaMonkey.png")
-        self.getDims(5)
+        self.image = pygame.image.load("ninjaMonkey.png").convert_alpha()
+        self.getDims(7)
         self.name = "NINJA MONKEY"
+        self.originalImage = pygame.image.load('gameNinja.png').convert_alpha()
+        self.originalImage = pygame.transform.rotate(self.originalImage, -90)
+        self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
-
-class Tile(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super(Tile, self).__init__()
-        self.x = x
-        self.y = y
-
-    def getRect(self): 
-        self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius,
-                                self.side, self.side)
-
-    def update(self, screenWidth, screenHeight):
-        self.getRect()
-
-    def getDims(self, scale):
-        self.side = self.image.get_width()//scale
-        self.radius = self.side//2
-        self.rect = pygame.Rect(self.x - self.radius, self.y - self.radius,
-                                self.side, self.side)
-
-class StoneTile(Tile):
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.image = pygame.image.load("stoneTile.jpg")
-        super().getDims(4)
-        self.name = "Stone Tile"
-        self.image = pygame.transform.scale(self.image, (self.side,self.side))
-
-class BloonsTowerDefense(ModalApp):
-    def appStarted(self):
-        self.game = Game()
-        self.setActiveMode(self.game)
-
-class Game(Mode):
-    def appStarted(self):
-        # general pygame template copied from 
-        # http://blog.lukasperaza.com/getting-started-with-pygame/
-        # with modifications
-        pygame.init()
-        self.width=800
-        self.height=600
-        self.rows = 10
-        self.cols = 10
-        screen = pygame.display.set_mode((self.width,self.height))
-        clock = pygame.time.Clock()
-
-        # initializing the towers
-        self.towers = pygame.sprite.Group()
-        self.playing = True
-        self.dart = Dart(650,100)
-        self.boom = Boom(750,100)
-        self.bomb = Bomb(650,180)
-        self.wizard = Wizard(750,180)
-        self.ninja = Ninja(650,260)
-        self.superM = SuperM(750,260)
-        self.towers.add(self.dart, self.boom, self.bomb, self.wizard, self.ninja, self.superM)
-
-        # intializing the tiles and map
-        self.mapStartX = 50
-        self.mapStartY = 50
-        self.tiles = pygame.sprite.Group()
-        self.createTiles()
-
-        # writing text
-        pygame.font.init()
-        self.font = pygame.font.SysFont('Arial Bold', 20)
-        textsurface = self.font.render('DART MONKEY', False, (0,0,0))
-        self.textstart = 7*self.width/8 - textsurface.get_width()/2
-        generateMapTextSurface = self.font.render('Generate New Map', False, (0,0,0))
-        self.generateMapText = (650, 550)
-
-        while self.playing:
-            clock.tick(50)
-            for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    for tower in self.towers:
-                        if event.button == 1:
-                            if tower.checkBounds(event.pos):
-                                textsurface = self.font.render(f'{tower.name}', False, (0,0,0))
-                                self.textstart = 7*self.width/8 - textsurface.get_width()/2
-                                tower.drag = True 
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    for tower in self.towers:
-                        if event.button == 1:
-                            tower.drag = False
-                elif event.type == pygame.MOUSEMOTION:
-                    for tower in self.towers:
-                        if tower.drag:
-                            tower.x, tower.y = event.pos[0], event.pos[1]
-                elif event.type == pygame.QUIT:
-                    self.playing = False
-            self.tiles.update(800, 600)
-            self.towers.update(800, 600)
-            screen.fill((255, 255, 255))
-            screen.blit(textsurface, (self.textstart, self.height/13))
-            screen.blit(generateMapTextSurface, (self.generateMapText))
-            self.tiles.draw(screen)
-            self.towers.draw(screen)
-            pygame.display.flip()
-        pygame.quit()
-
-    def createTiles(self):
-        tileList = mapGenerator.generateMap(10,10)
-        print(tileList)
-        for tile in tileList:
-            row, col = tile[0], tile[1]
-            sampleTile = StoneTile(0,0)
-            x = self.mapStartX + col*sampleTile.side
-            y = self.mapStartY + row*sampleTile.side
-            newTile = StoneTile(x,y)
-            self.tiles.add(newTile)
-
-BloonsTowerDefense()
+        self.cost = 500
+        self.firingRange = 100
+        self.timerDelay = 1000
+        self.tickLevel = 50
+    
+    def fireWeapons(self, bloons):
+        shortest = None
+        shortestBloon = None
+        for bloon in bloons:
+            current = len(bloon.tiles)
+            if ((shortestBloon == None) or (current <= shortest)):
+                shortest = current
+                shortestBloon = bloon
+        vecX = shortestBloon.x - self.x
+        vecY = shortestBloon.y - self.y 
+        if vecX == 0:
+            vecX = 0.01
+        self.angle = math.atan2(vecY, vecX)
+        self.rotate()
+        return self.angle
