@@ -1,3 +1,6 @@
+# This contains the Tower class, which is subclassed by towers on the sidebar and towers in the game
+# It includes information about the images, firing rate, firing angle, and firing algorithm for each type of tower
+
 import pygame, random, math
 from bloons import * 
 
@@ -13,6 +16,8 @@ class Tower(pygame.sprite.Sprite):
         self.tick = 0
         self.angle = 0
         self.weapons = pygame.sprite.Group()
+        self.clicked = False
+        self.upgraded = False
 
     def getRect(self): 
         self.rect = pygame.Rect(self.x - self.radiusX, self.y - self.radiusY,

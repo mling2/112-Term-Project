@@ -1,3 +1,6 @@
+# This file contains the Weapon class, which is subclassed by each type of weapon 
+# It includes the information on the speed, deployment rate, and image of weapons
+
 import pygame, random, math
 
 class Weapon(pygame.sprite.Sprite):

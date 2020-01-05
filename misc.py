@@ -1,3 +1,7 @@
+# This contains the Button class, which contain all the properties for the buttons used in the game,
+# including checkBounds and the graphics creation
+# This also contains the Arrow class, which are drawn along the path to guide the player 
+
 import pygame, random
 
 class Button(pygame.sprite.Sprite):

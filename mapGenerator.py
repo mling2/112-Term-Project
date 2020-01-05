@@ -1,3 +1,6 @@
+# This file generates random maps using a backtracker 
+# It returns an ordered list with all the coordinates of the tiles on the path 
+
 import copy, time, random
 
 # Generic Backtracking Puzzle Solver copied from 

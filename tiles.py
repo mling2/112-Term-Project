@@ -1,3 +1,7 @@
+# This contains the Tile class, 
+# which is subclassed by the StoneTiles that mark the paths and Obstacle, which are the trees
+# using the checkBounds method, this ensures that towers and tiles/trees do not collide 
+
 import pygame, random
 
 class Tile(pygame.sprite.Sprite):

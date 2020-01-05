@@ -1,6 +1,11 @@
+# This is the main file that contains the modal app framework
+# The modes are the splash screen, main menu/ settings, game, instructions, map creation, and game over
+# This contains all the user input controls and draws the pygame window
+# It also keeps track of bloon deployment rates and the interactions system between bloons, weapons, and towers
+
 import pygame, random, math, copy
 import mapGenerator
-# Modal App framework from https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
+# cmu_112_graphics from https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
 from cmu_112_graphics import *
 from towers import *
 from tiles import *
@@ -8,7 +13,8 @@ from misc import *
 from bloons import * 
 from weapons import * 
 
-class BloonsTowerDefense(ModalApp):
+# Modal App framework from https://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
+class BlewnsTowerDefense(ModalApp):
     def appStarted(self):
         self.splashScreen = SplashScreen()
         self.game = Game()
@@ -106,6 +112,7 @@ class Game(Mode):
         screen = pygame.display.set_mode((self.width,self.height))
         clock = pygame.time.Clock()
         self.totalBloonsDeployed = 0
+        self.levelBloonsDeployed = 0
         self.totalBloonsPopped = 0
         self.deployCamo = False
         self.startDeployment = False
@@ -122,7 +129,7 @@ class Game(Mode):
                 # deploying balloons
                 self.bloonDeployment()
                 self.levelingUp()
-                if self.totalBloonsPopped >= self.total:
+                if self.totalBloonsDeployed >= self.total:
                     self.finishDeployment = True
             
             if not self.finishDeployment:
@@ -151,7 +158,7 @@ class Game(Mode):
             self.font2 = pygame.font.SysFont('Arial Bold', 30)
             scoreTextSurface = self.font2.render(f'Lives: {self.score}', False, (0,0,0))
             coinsTextSurface = self.font2.render(f'Coins: {self.coins}', False, (0,0,0))
-            bloonsTextSurface = self.font2.render(f'Blewns Left: {self.total-self.totalBloonsPopped}', False, (0,0,0))
+            bloonsTextSurface = self.font2.render(f'Blewns Left: {self.total-self.totalBloonsDeployed}', False, (0,0,0))
 
             levelTextSurface = self.font2.render(f'LEVEL: {self.currentLevel}/{self.levels}', False, (0,0,0))
 
@@ -165,15 +172,20 @@ class Game(Mode):
                     self.score -= bloon.reward
                     self.bloons.remove(bloon)
 
+            # finish the game and go to game over screen
             if ((self.finishDeployment) and (len(self.bloons) == 0)):
                 self.app.setActiveMode(self.app.gameOver)
 
+            # events
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
+                    # start over
                     if event.key == pygame.K_RETURN:
                         self.appStarted()
+                    # return to main menu
                     elif event.key == pygame.K_ESCAPE:
                         self.app.setActiveMode(self.app.settings)
+                    # fast forward
                     elif event.key == pygame.K_RIGHT:
                         if self.speedPos < 3:
                             self.redLevel //= 2
@@ -191,7 +203,7 @@ class Game(Mode):
                                     if bloon.timerDelay <= 5:
                                         bloon.check += (5-bloon.timerDelay)
                             self.speedPos += 1
-                        print(self.speedPos)
+                    # slow down
                     elif event.key == pygame.K_LEFT:
                         if self.speedPos > -3:
                             self.redLevel *= 2
@@ -208,15 +220,16 @@ class Game(Mode):
                                 if bloon.timerDelay <= 5:
                                         bloon.check += (5-bloon.timerDelay)
                             self.speedPos -= 1
-                        print(self.speedPos)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for tower in self.towers:
                         if event.button == 1:
+                            # play button to start bloon deployment
                             if ((event.pos[0] < 675+60) and 
                                 (event.pos[0] > 675-60) and 
                                 (event.pos[1] < 525+50) and 
                                 (event.pos[1] > 525-50)):
                                 self.startDeployment = True
+                            # create a game tower
                             if tower.checkBounds(event.pos):
                                 if type(tower) == Dart: newTower = Dart(event.pos[0], event.pos[1])
                                 elif type(tower) == Boom: newTower = Boom(event.pos[0], event.pos[1])
@@ -230,11 +243,44 @@ class Game(Mode):
                                 newTower.drag = True
                                 if self.inMap(event.pos):
                                     newTower.showRange = True
+                    # showing range and options for game tower
                     for tower in self.gameTowers:
-                        if self.inMap(event.pos):
-                            tower.showRange = True
+                        if tower.checkBounds(event.pos) and self.inMap(event.pos):
+                            tower.showRange = not tower.showRange
+                            tower.clicked = not tower.clicked 
+                    for tower in self.gameTowers:
+                        if not tower.clicked:
+                            self.upgradeButton = Button(694, 360, '', (255, 254, 161), self.font12)
+                            self.sellButton = Button(700, 400, '', (255, 254, 161), self.font12)
+                    for tower in self.gameTowers:
+                        if tower.clicked and not tower.upgraded: 
+                            self.upgradeButton = Button(694, 360, "UPGRADE", (125, 250, 122), self.font12)
+                            self.sellButton = Button(700, 400, "SELL", (125, 250, 122), self.font12)
+                    for tower in self.gameTowers:
+                        if tower.clicked and tower.upgraded:
+                            self.upgradeButton = Button(694, 360, '', (255, 254, 161), self.font12)
+                            self.sellButton = Button(700, 400, "SELL", (125, 250, 122), self.font12)
+                    for tower in self.gameTowers: 
+                        if tower.clicked and self.upgradeButton.checkBounds(event.pos) and not tower.upgraded:
+                            if (self.coins - int(0.5*tower.cost)) >= 0:
+                                tower.firingRange += int(0.5*tower.firingRange)
+                                tower.tickLevel -= int(0.25*tower.firingRange)
+                                self.coins -= int(0.5*tower.cost)
+                                tower.clicked = False
+                                tower.showRange = False
+                                tower.upgraded = True
+                                self.upgradeButton = Button(694, 360, '', (255, 254, 161), self.font12)
+                                self.sellButton = Button(700, 400, '', (255, 254, 161), self.font12)
+                        elif tower.clicked and self.sellButton.checkBounds(event.pos):
+                            self.gameTowers.remove(tower)
+                            self.coins += int(0.5*tower.cost)
+                            tower.clicked = False
+                            tower.showRange = False
+                            self.upgradeButton = Button(694, 360, '', (255, 254, 161), self.font12)
+                            self.sellButton = Button(700, 400, '', (255, 254, 161), self.font12)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     for tower in self.gameTowers:
+                        # setting down a tower on the map but not colliding with tiles or trees
                         if event.button == 1 and tower.drag:
                             for block in self.blocks:
                                 if block.checkBounds(event.pos) or not self.inMap(event.pos) or (self.coins < 0):
@@ -244,8 +290,8 @@ class Game(Mode):
                                 elif self.inMap(event.pos):
                                     tower.inMap = True
                                 tower.drag = False
-                        tower.showRange = False
                 elif event.type == pygame.MOUSEMOTION:
+                    # dragging a tower onto the map
                     red = False
                     for tower in self.gameTowers:
                         if tower.drag:
@@ -350,12 +396,20 @@ class Game(Mode):
             screen.blit(scoreTextSurface, (25, 550))
             screen.blit(coinsTextSurface, (175, 550))
             screen.blit(bloonsTextSurface, (325, 550))
-            screen.blit(levelTextSurface, (640, 400))
+            screen.blit(levelTextSurface, (640, 430))
             screen.blit(self.playButton, (675, 475))
+            
             pygame.draw.rect(screen, self.rightArrow.boxColor, self.rightArrow.boxRect, 5)
             pygame.draw.rect(screen, self.leftArrow.boxColor, self.leftArrow.boxRect, 5)
             screen.blit(self.rightArrow.textSurf, self.rightArrow.textRect)
             screen.blit(self.leftArrow.textSurf, self.leftArrow.textRect)
+
+            pygame.draw.rect(screen, self.upgradeButton.boxColor, self.upgradeButton.boxRect)
+            pygame.draw.rect(screen, self.sellButton.boxColor, self.sellButton.boxRect)
+            screen.blit(self.upgradeButton.textSurf, self.upgradeButton.textRect)
+            screen.blit(self.sellButton.textSurf, self.sellButton.textRect)
+
+
             self.tiles.draw(screen)
             self.grassTiles.draw(screen)
             self.arrows.draw(screen)
@@ -386,6 +440,10 @@ class Game(Mode):
         self.rightArrow = Button(765, 505, ">>", (0,0,0), self.arrowFont)
         self.leftArrow = Button(645, 505, "<<", (0,0,0), self.arrowFont)
         self.speedPos = 0
+
+        self.font12 = pygame.font.SysFont("Arial Bold", 22)
+        self.upgradeButton = Button(694, 360, '', (255, 254, 161), self.font12)
+        self.sellButton = Button(700, 400, '', (255, 254, 161), self.font12)
 
         # initializing the scores and coins
         if self.app.settings.level == "easy": 
@@ -581,36 +639,41 @@ class Game(Mode):
         if self.greenTick > self.greenLevel: 
             self.bloons.add(Green(self.x,self.y,self.tileList))
             self.totalBloonsDeployed += 1
+            self.levelBloonsDeployed += 1
             self.greenTick = 0
         if self.blueTick > self.blueLevel: 
             self.bloons.add(Blue(self.x,self.y,self.tileList))
             self.totalBloonsDeployed += 1
+            self.levelBloonsDeployed += 1
             self.blueTick = 0
         if self.yellowTick > self.yellowLevel:
             self.bloons.add(Yellow(self.x,self.y,self.tileList))
             self.totalBloonsDeployed += 1
+            self.levelBloonsDeployed += 1
             self.yellowTick = 0
         if self.redTick > self.redLevel:
             self.bloons.add(Red(self.x,self.y,self.tileList))
             self.totalBloonsDeployed += 1
+            self.levelBloonsDeployed += 1
             self.redTick = 0
         if self.deployCamo:
             if self.camoTick > self.camoThreshold:
                 self.bloons.add(Camo(self.x, self.y, self.tileList))
                 self.totalBloonsDeployed += 1
+                self.levelBloonsDeployed += 1
                 self.camoTick = 0
         if self.camoLevelTick > self.camoLevelThreshold:
             self.deployCamo = True
     
     def levelingUp(self):
-        if self.totalBloonsDeployed == 40:
+        if (self.levelBloonsDeployed == 40):
             if self.redLevel > self.redMin: self.redLevel -= self.levelUp
             if self.blueLevel > self.blueMin: self.blueLevel -= self.levelUp
             if self.yellowLevel > self.yellowMin: self.yellowLevel -= self.levelUp
             if self.greenLevel > self.greenMin: self.greenLevel -= self.levelUp
             if self.currentLevel < self.levels:
                 self.currentLevel += 1
-            self.totalBloonsDeployed = 0
+            self.levelBloonsDeployed = 0
 
 class SplashScreen(Mode):
     def appStarted(self):
@@ -648,7 +711,7 @@ class Instructions(Mode):
         clock = pygame.time.Clock()
         pygame.font.init()
         self.playing = True
-        self.slides = ['instruct1.png', 'instruct2.png', 'instruct3.png', 'instruct4.png']
+        self.slides = ['instruct1.png', 'instruct2.png', 'instruct3.png', 'instruct4.png', 'instruct5.png']
         self.ind = 0
         
         while self.playing:
@@ -717,7 +780,7 @@ class GameOver(Mode):
             if self.app.game.score <= 0:
                 self.image = pygame.image.load(self.slides[1]).convert()
             else:
-                self.image = pygame.image.load(self.slides[1]).convert()
+                self.image = pygame.image.load(self.slides[0]).convert()
             screen.blit(self.image, (0,0))
             pygame.display.update()
         pygame.quit()
@@ -838,4 +901,4 @@ class MapCreator(Mode):
         elif down in tilesLeft: return down
         else: return None
 
-BloonsTowerDefense()
+BlewnsTowerDefense()

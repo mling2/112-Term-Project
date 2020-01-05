@@ -1,3 +1,7 @@
+# This contains the Bloon class, which is subclassed by the four colored bloons and Camo bloons
+# Each bloon type has its own properties like health, reward, cost, and speed 
+# This class also contains the method for moving bloons along the path
+
 import pygame, random, copy
 from tiles import * 
 
