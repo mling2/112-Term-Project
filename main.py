@@ -432,7 +432,7 @@ class Game(Mode):
 
     def initializeFeatures(self):
         # play button
-        self.playButton = pygame.image.load('playbutton.png').convert_alpha()
+        self.playButton = pygame.image.load('images/playbutton.png').convert_alpha()
         self.playButton = pygame.transform.scale(self.playButton, (60,60))
 
         # fast forward and backwards buttons
@@ -696,7 +696,7 @@ class SplashScreen(Mode):
                 elif event.type == pygame.QUIT:
                     self.playing = False
             screen.fill((255, 255, 255))
-            self.image = pygame.image.load('BTDtitle.png').convert()
+            self.image = pygame.image.load('images/BTDtitle.png').convert()
             self.image = pygame.transform.scale(self.image, (800,600))
             screen.blit(self.image, (0,0))
             pygame.display.update()
@@ -711,7 +711,7 @@ class Instructions(Mode):
         clock = pygame.time.Clock()
         pygame.font.init()
         self.playing = True
-        self.slides = ['instruct1.png', 'instruct2.png', 'instruct3.png', 'instruct4.png', 'instruct5.png']
+        self.slides = ['images/instruct1.png', 'images/instruct2.png', 'images/instruct3.png', 'images/instruct4.png', 'images/instruct5.png']
         self.ind = 0
         
         while self.playing:
@@ -766,7 +766,7 @@ class GameOver(Mode):
         clock = pygame.time.Clock()
         pygame.font.init()
         self.playing = True
-        self.slides = ['win.png', 'lose.png']
+        self.slides = ['images/win.png', 'images/lose.png']
         
         while self.playing:
             clock.tick(100)
@@ -809,7 +809,7 @@ class MapCreator(Mode):
         self.BROWN = (153, 76, 0)
         self.textsurface = self.font.render(" ", False, (0,0,0))
         self.textstart = self.width//2 - self.textsurface.get_width()/2
-        self.instruct = pygame.image.load('mapcreate.png').convert_alpha()
+        self.instruct = pygame.image.load('images/mapcreate.png').convert_alpha()
         
         while self.playing:
             clock.tick(100)

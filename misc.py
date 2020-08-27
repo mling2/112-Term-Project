@@ -34,7 +34,7 @@ class Arrow(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.angle = angle
-        self.image = pygame.image.load('greenArrow.png')
+        self.image = pygame.image.load('images/greenArrow.png')
         self.getDims(13)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))
         self.image = pygame.transform.rotate(self.originalImage, self.angle).convert_alpha()

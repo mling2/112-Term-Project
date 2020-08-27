@@ -32,7 +32,7 @@ class Tile(pygame.sprite.Sprite):
 class StoneTile(Tile):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("stoneTile.jpg").convert_alpha()
+        self.image = pygame.image.load("images/stoneTile.jpg").convert_alpha()
         super().getDims(5)
         self.name = "Stone Tile"
         self.image = pygame.transform.scale(self.image, (self.side,self.side))
@@ -40,7 +40,7 @@ class StoneTile(Tile):
 class Obstacle(Tile):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('christmasTree.png').convert_alpha()
+        self.image = pygame.image.load('images/christmasTree.png').convert_alpha()
         super().getDims(9)
         self.name = 'Grass Tile'
         self.image = pygame.transform.scale(self.image, (self.side,self.side))

@@ -69,7 +69,7 @@ class Bloon(pygame.sprite.Sprite):
 class Green(Bloon):
     def __init__(self, x, y, tiles):
         super().__init__(x,y,tiles)
-        self.image = pygame.image.load('greenBloon.png').convert_alpha()
+        self.image = pygame.image.load('images/greenBloon.png').convert_alpha()
         self.health = 3
         self.reward = 3
         self.getDims(2)
@@ -80,7 +80,7 @@ class Green(Bloon):
 class Blue(Bloon):
     def __init__(self, x, y, tiles):
         super().__init__(x,y,tiles)
-        self.image = pygame.image.load('blueBloon.png').convert_alpha()
+        self.image = pygame.image.load('images/blueBloon.png').convert_alpha()
         self.health = 2
         self.reward = 2
         self.getDims(2)
@@ -91,7 +91,7 @@ class Blue(Bloon):
 class Yellow(Bloon):
     def __init__(self, x, y, tiles):
         super().__init__(x,y,tiles)
-        self.image = pygame.image.load('yellowBloon.png').convert_alpha()
+        self.image = pygame.image.load('images/yellowBloon.png').convert_alpha()
         self.health = 4
         self.reward = 4
         self.getDims(2)
@@ -102,7 +102,7 @@ class Yellow(Bloon):
 class Red(Bloon):
     def __init__(self, x, y, tiles):
         super().__init__(x,y,tiles)
-        self.image = pygame.image.load('red.png').convert_alpha()
+        self.image = pygame.image.load('images/red.png').convert_alpha()
         self.health = 1
         self.reward = 1
         self.getDims(6)
@@ -113,7 +113,7 @@ class Red(Bloon):
 class Camo(Bloon):
     def __init__(self, x, y, tiles):
         super().__init__(x,y,tiles)
-        self.colors = ['redCamo.png', 'blueCamo.png', 'greenCamo.png', 'yellowCamo.png']
+        self.colors = ['images/redCamo.png', 'images/blueCamo.png', 'images/greenCamo.png', 'images/yellowCamo.png']
         num = random.randint(0,3)
         self.image = pygame.image.load(self.colors[num]).convert_alpha()
         self.health = num
@@ -131,7 +131,7 @@ class Popped(pygame.sprite.Sprite):
         super(Popped, self).__init__()
         self.x = x
         self.y = y
-        self.image = pygame.image.load('bloonPop.png').convert_alpha()
+        self.image = pygame.image.load('images/bloonPop.png').convert_alpha()
         self.width = self.image.get_width()//5
         self.height = self.image.get_height()//5
         self.radiusX = self.width//2

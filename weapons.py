@@ -43,7 +43,7 @@ class Weapon(pygame.sprite.Sprite):
 class NinjaStar(Weapon):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('ninjaStar.png').convert_alpha()
+        self.image = pygame.image.load('images/ninjaStar.png').convert_alpha()
         self.damage = 2
         self.getDims(15)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))
@@ -54,7 +54,7 @@ class NinjaStar(Weapon):
 class BombBomb(Weapon):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('bomb.png').convert_alpha()
+        self.image = pygame.image.load('images/bomb.png').convert_alpha()
         self.damage = 4
         self.getDims(20)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))
@@ -65,7 +65,7 @@ class BombBomb(Weapon):
 class DartDart(Weapon):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('dart.png').convert_alpha()
+        self.image = pygame.image.load('images/dart.png').convert_alpha()
         self.damage = 1
         self.getDims(35)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))
@@ -76,7 +76,7 @@ class DartDart(Weapon):
 class Rang(Weapon):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('boomerang.png').convert_alpha()
+        self.image = pygame.image.load('images/boomerang.png').convert_alpha()
         self.damage = 1
         self.getDims(16)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))
@@ -87,7 +87,7 @@ class Rang(Weapon):
 class Plasma(Weapon):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('plasma.png').convert_alpha()
+        self.image = pygame.image.load('images/plasma.png').convert_alpha()
         self.damage = 5
         self.getDims(15)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))
@@ -98,7 +98,7 @@ class Plasma(Weapon):
 class Fire(Weapon):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load('fire.png').convert_alpha()
+        self.image = pygame.image.load('images/fire.png').convert_alpha()
         self.damage = 4
         self.getDims(15)
         self.originalImage = pygame.transform.scale(self.image, (self.width,self.height))

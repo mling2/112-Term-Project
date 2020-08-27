@@ -76,8 +76,8 @@ class Tower(pygame.sprite.Sprite):
 class Dart(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.originalImage = pygame.image.load('gameDart.png').convert_alpha()
-        self.image = pygame.image.load("dartMonkey.png").convert_alpha()
+        self.originalImage = pygame.image.load('images/gameDart.png').convert_alpha()
+        self.image = pygame.image.load("images/dartMonkey.png").convert_alpha()
         self.getDims(8)
         self.name = "DART MONKEY"
         self.originalImage = pygame.transform.scale(self.originalImage, (self.width-20,self.height-20))
@@ -91,10 +91,10 @@ class Dart(Tower):
 class Boom(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("boomerangMonkey.png").convert_alpha()
+        self.image = pygame.image.load("images/boomerangMonkey.png").convert_alpha()
         self.getDims(6)
         self.name = "BOOMERANG MONKEY"
-        self.originalImage = pygame.image.load('gameBoomer.png').convert_alpha()
+        self.originalImage = pygame.image.load('images/gameBoomer.png').convert_alpha()
         self.originalImage = pygame.transform.rotate(self.originalImage, -90)
         self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
@@ -106,10 +106,10 @@ class Boom(Tower):
 class Bomb(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("bombShooter.png").convert_alpha()
+        self.image = pygame.image.load("images/bombShooter.png").convert_alpha()
         self.getDims(8)
         self.name = "BOMB SHOOTER"
-        self.originalImage = pygame.image.load('gameBomb.png').convert_alpha()
+        self.originalImage = pygame.image.load('images/gameBomb.png').convert_alpha()
         self.originalImage = pygame.transform.rotate(self.originalImage, -90)
         self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
@@ -141,10 +141,10 @@ class Bomb(Tower):
 class SuperM(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("superMonkey.png").convert_alpha()
+        self.image = pygame.image.load("images/superMonkey.png").convert_alpha()
         self.getDims(6)
         self.name = "SUPER MONKEY"
-        self.originalImage = pygame.image.load('gameSuper.png').convert_alpha()
+        self.originalImage = pygame.image.load('images/gameSuper.png').convert_alpha()
         self.originalImage = pygame.transform.rotate(self.originalImage, -90)
         self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
@@ -175,10 +175,10 @@ class SuperM(Tower):
 class Wizard(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("wizardMonkey.png").convert_alpha()
+        self.image = pygame.image.load("images/wizardMonkey.png").convert_alpha()
         self.getDims(8)
         self.name = "WIZARD MONKEY"
-        self.originalImage = pygame.image.load('gameWizard.png').convert_alpha()
+        self.originalImage = pygame.image.load('images/gameWizard.png').convert_alpha()
         self.originalImage = pygame.transform.rotate(self.originalImage, -90)
         self.originalImage = pygame.transform.scale(self.originalImage, (self.originalImage.get_width()-20, self.originalImage.get_height()-20))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
@@ -206,10 +206,10 @@ class Wizard(Tower):
 class Ninja(Tower):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.image = pygame.image.load("ninjaMonkey.png").convert_alpha()
+        self.image = pygame.image.load("images/ninjaMonkey.png").convert_alpha()
         self.getDims(7)
         self.name = "NINJA MONKEY"
-        self.originalImage = pygame.image.load('gameNinja.png').convert_alpha()
+        self.originalImage = pygame.image.load('images/gameNinja.png').convert_alpha()
         self.originalImage = pygame.transform.rotate(self.originalImage, -90)
         self.originalImage = pygame.transform.scale(self.originalImage, (self.width,self.height))
         self.image = pygame.transform.scale(self.image, (self.width,self.height))
